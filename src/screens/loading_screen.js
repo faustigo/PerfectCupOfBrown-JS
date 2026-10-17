@@ -8,9 +8,7 @@ export class LoadingScreen extends BaseScreen {
         super(screenSetter);
     }
 
-    render() {
-        const gameCanvas = document.getElementById("gameCanvas");
-        const ctx = gameCanvas.getContext("2d");
+    render(gameCanvas, ctx) {
         var [total_assets, loaded_assets] = Assets.getLoadProgress();
         ctx.fillStyle = "black";
         ctx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
