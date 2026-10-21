@@ -19,7 +19,7 @@ export class PauseScreen extends BaseScreen {
         this.addWidget(new Button("Main Menu", gameCanvas.width / 2 - 120, 200, 240, 80, event => {
             this.screenSetter(new TitleScreen(this.screenSetter));
         }));
-        this.addWidget(new Button("Help", gameCanvas.width / 2 - 120, 200, 240, 80, event => {
+        this.addWidget(new Button("Help", gameCanvas.width / 2 - 120, 340, 240, 80, event => {
             // TODO help button
         }));
     }
