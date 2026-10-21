@@ -132,15 +132,25 @@ export class BaseGameState {
         }
         if (this.action !== ACTION_SERVE)
             this.serveTime += dt;
-        if (this.action === ACTION_NOTHING && (this.pouringCoffee || this.pouringMilk)) {
-            let addedCoffee = 0.0;
-            let addedMilk = 0.0;
-            
-            // TODO rate of pouring
-            if (this.pouringCoffee)
-                addedCoffee = 10.0 * dt;
-            if (this.pouringMilk)
-                addedMilk = 10.0 * dt;
+        if (this.action !== ACTION_NOTHING) {
+            this.coffeePourRate = 0.0;
+            this.milkPourRate = 0.0;
+        } else if (this.coffeePourRate > 1e-4 || this.milkPourRate > 1e-4 || this.pouringCoffee || this.pouringMilk) {
+            const MAX_POUR_RATE = 40.0;
+            const POUR_ACCELERATION = 20.0;
+            if (this.pouringCoffee) {
+                this.coffeePourRate = Math.min(MAX_POUR_RATE, this.coffeePourRate + POUR_ACCELERATION*dt);
+            } else {
+                this.coffeePourRate = Math.max(0, this.coffeePourRate - POUR_ACCELERATION*dt);
+            }
+            if (this.pouringMilk) {
+                this.milkPourRate = Math.min(MAX_POUR_RATE, this.milkPourRate + POUR_ACCELERATION*dt);
+            } else {
+                this.milkPourRate = Math.max(0, this.milkPourRate - POUR_ACCELERATION*dt);
+            }
+            // For simplicity, do not incorporate 1/2*a*t^2 into pouring equation.
+            let addedCoffee = this.coffeePourRate*dt;
+            let addedMilk = this.milkPourRate*dt;
 
             let totalOldFluid = this.coffeeAmount + this.milkAmount;
             let totalNewFluid = addedCoffee + addedMilk;
