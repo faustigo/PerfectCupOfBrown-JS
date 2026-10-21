@@ -10,20 +10,31 @@ export class BaseScreen {
     }
 
     render(gameCanvas, ctx) {
-        for (let idx in this.widgets)
-            this.widgets[idx].render(gameCanvas, ctx);
+        for (var i = 0; i < this.widgets.length; ++i)
+            this.widgets[i].render(gameCanvas, ctx);
     }
 
     onClick(event) {
-        for (let idx in this.widgets) {
-            if (this.widgets[idx].onClick(event))
+        for (var i = 0; i < this.widgets.length; ++i) {
+            if (this.widgets[i].onClick(event))
                 break;
         }
     }
 
     setHovered(event) {
-        for (let idx in this.widgets)
-            this.widgets[idx].setHovered(event);
+        for (var i = 0; i < this.widgets.length; ++i)
+            this.widgets[i].setHovered(event);
+    }
+
+    clearHovering() {
+        for (var i = 0; i < this.widgets.length; ++i)
+            this.widgets[i].setHoveredDirect(false);
+    }
+
+    onKeyDown(event) {
+    }
+
+    onKeyUp(event) {
     }
 
 }

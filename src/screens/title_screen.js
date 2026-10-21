@@ -1,8 +1,9 @@
 import { BaseScreen } from "./screen.js";
-import * as Assets from "../asset_index.js";
+import { MainGameplayScreen } from "./game_screen.js";
 import { Button } from "../gui/button.js";
+import * as Assets from "../asset_index.js";
+import * as Colors from "../colors.js";
 
-const COFFEE_BROWN_TEXT = "#6F4E37";
 
 export class TitleScreen extends BaseScreen {
 
@@ -10,13 +11,13 @@ export class TitleScreen extends BaseScreen {
         super(screenSetter);
         const gameCanvas = document.getElementById("gameCanvas");
         this.addWidget(new Button("Let's Pour!", gameCanvas.width / 2 - 120, 240, 240, 80, event => {
-            console.log("Let's Pour Clicked");
+            this.screenSetter(new MainGameplayScreen(this.screenSetter));
         }));
     }
 
     render(gameCanvas, ctx) {
         ctx.drawImage(Assets.COUNTER_BG, 0, 0, gameCanvas.width, gameCanvas.height);
-        ctx.fillStyle = COFFEE_BROWN_TEXT;
+        ctx.fillStyle = Colors.COFFEE_BROWN;
         ctx.beginPath();
         ctx.roundRect(gameCanvas.width/2 - 300, 80, 600, 120, 20);
         ctx.fill();

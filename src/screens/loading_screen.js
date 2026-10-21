@@ -1,6 +1,6 @@
 import { BaseScreen } from "./screen.js";
-import * as Assets from "../asset_index.js";
 import { TitleScreen } from "./title_screen.js";
+import * as Assets from "../asset_index.js";
 
 export class LoadingScreen extends BaseScreen {
 

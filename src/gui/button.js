@@ -1,7 +1,5 @@
 import { Widget } from "./widget.js"; 
-
-const COFFEE_BROWN_TEXT = "#6F4E37";
-const COFFEE_BROWNER_TEXT = "#4F2E17";
+import * as Colors from "../colors.js";
 
 export class Button extends Widget {
 
@@ -12,7 +10,7 @@ export class Button extends Widget {
     }
 
     render(gameCanvas, ctx) {
-        ctx.fillStyle = this.isHovered() ? COFFEE_BROWNER_TEXT : COFFEE_BROWN_TEXT;
+        ctx.fillStyle = this.isHovered() ? Colors.COFFEE_BROWN_HOVERED : Colors.COFFEE_BROWN;
         ctx.beginPath();
         ctx.roundRect(this.x, this.y, this.width, this.height, 20);
         ctx.fill();

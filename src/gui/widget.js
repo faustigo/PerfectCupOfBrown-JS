@@ -6,8 +6,9 @@ export class Widget {
         this.width = width;
         this.height = height;
         this.clickCallback = clickCallback;
+        if (this.clickCallback)
+            this.clickCallback.bind(this);
         this.hovered = false;
-        const gameCanvas = document.getElementById("gameCanvas");
     }
 
     render(gameCanvas, ctx) {
@@ -23,6 +24,10 @@ export class Widget {
 
     setHovered(event) {
         this.hovered = this.x <= event.clientX && event.clientX < this.x + this.width && this.y <= event.clientY && event.clientY < this.y + this.height;
+    }
+
+    setHoveredDirect(hovered) {
+        this.hovered = hovered;
     }
 
     isHovered() {

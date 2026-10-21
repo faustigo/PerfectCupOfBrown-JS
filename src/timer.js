@@ -8,17 +8,17 @@ export class Timer {
         this.timeInit = null;
     }
 
-    tick(timerObj) {
-        timerObj.runnable();
-        timerObj.timeInit += timerObj.interval;
-        timerObj.timer = setTimeout(() => timerObj.tick(timerObj), this.timeInit - (new Date()).getTime());
+    tick() {
+        this.runnable();
+        this.timeInit += this.interval;
+        this.timer = setTimeout(this.tick.bind(this), this.timeInit - (new Date()).getTime());
     }
 
     start() {
         if (this.timer !== null)
             return;
         this.timeInit = (new Date()).getTime();
-        this.tick(this);
+        this.tick();
     }
 
     stop() {

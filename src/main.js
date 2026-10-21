@@ -1,6 +1,6 @@
 import { Timer } from "./timer.js";
-import * as Assets from "./asset_index.js";
 import { LoadingScreen } from "./screens/loading_screen.js";
+import * as Assets from "./asset_index.js";
 
 const TIMER = new Timer(60, mainloop);
 
@@ -12,14 +12,22 @@ function setScreen(screen) {
 
 function main() {
     const gameCanvas = document.getElementById("gameCanvas");
-    gameCanvas.addEventListener("click", (event) => {
+    gameCanvas.addEventListener("click", event => {
         if (CURRENT_SCREEN)
             CURRENT_SCREEN.onClick(event);
     });
-    gameCanvas.addEventListener("mousemove", (event) => {
+    gameCanvas.addEventListener("mousemove", event => {
         if (CURRENT_SCREEN)
             CURRENT_SCREEN.setHovered(event);
     });
+    document.addEventListener("keydown", event => {
+        if (CURRENT_SCREEN)
+            CURRENT_SCREEN.onKeyDown(event);
+    })
+    document.addEventListener("keyup", event => {
+        if (CURRENT_SCREEN)
+            CURRENT_SCREEN.onKeyUp(event);
+    })
     setScreen(new LoadingScreen(setScreen))
     TIMER.start();
 }
