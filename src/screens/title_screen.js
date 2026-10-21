@@ -2,6 +2,7 @@ import { BaseScreen } from "./screen.js";
 import { PracticeScreen } from "./practice_screen.js";
 import { TimeAttackScreen } from "./time_attack_screen.js";
 import { PerfectPourScreen } from "./perfect_pour_screen.js";
+import { AboutScreen } from "./about_screen.js";
 import { Button } from "../gui/button.js";
 import * as Assets from "../asset_index.js";
 import * as Colors from "../colors.js";
@@ -29,6 +30,10 @@ export class TitleScreen extends BaseScreen {
         this.addWidget(new Button("Practice", gameCanvas.width / 2 - 130, 440, 260, 80, event => {
             this.gameStateHandler.setScreen(new PracticeScreen(this.gameStateHandler));
             this.gameStateHandler.setGameState(new PracticeState());
+        }));
+        this.addWidget(new Button("(i)", 20, gameCanvas.height - 80, 60, 60, event => {
+            this.gameStateHandler.setScreen(new AboutScreen(this.gameStateHandler));
+            this.gameStateHandler.setGameState(null);
         }));
 
         const docCookies = document.cookie.split(";");
