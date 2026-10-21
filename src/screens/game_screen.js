@@ -147,8 +147,8 @@ export class MainGameplayScreen extends BaseScreen {
 
         // Render game state-dependent info
         if (gameState) {
-            this.renderGameInfo(gameCanvas, ctx, dt, gameState);
             this.renderCustomerRequest(gameCanvas, ctx, dt, gameState);
+            this.renderGameInfo(gameCanvas, ctx, dt, gameState);
         }
 
         super.render(gameCanvas, ctx, dt);

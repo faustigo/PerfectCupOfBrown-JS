@@ -1,10 +1,12 @@
 import { BaseScreen } from "./screen.js";
 import { PracticeScreen } from "./practice_screen.js";
+import { TimeAttackScreen } from "./time_attack_screen.js";
 import { Button } from "../gui/button.js";
 import * as Assets from "../asset_index.js";
 import * as Colors from "../colors.js";
 
 import { PracticeState } from "../gameplay/practice_state.js";
+import { TimeAttackState } from "../gameplay/time_attack_state.js";
 
 
 export class TitleScreen extends BaseScreen {
@@ -14,7 +16,8 @@ export class TitleScreen extends BaseScreen {
 
         const gameCanvas = document.getElementById("gameCanvas");
         this.addWidget(new Button("Time Attack", gameCanvas.width / 2 - 130, 240, 260, 80, event => {
-            // TODO time attack
+            this.gameStateHandler.setScreen(new TimeAttackScreen(this.gameStateHandler));
+            this.gameStateHandler.setGameState(new TimeAttackState());
         }));
         this.addWidget(new Button("Perfect Pours", gameCanvas.width / 2 - 130, 340, 260, 80, event => {
             // TODO perfection
