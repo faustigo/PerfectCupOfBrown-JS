@@ -10,10 +10,10 @@ export class PracticeScreen extends MainGameplayScreen {
     constructor(gameStateHandler) {
         super(gameStateHandler);
         const gameCanvas = document.getElementById("gameCanvas");
-        this.addWidget(new Button("^", gameCanvas.width - 300, gameCanvas.height - 240, 60, 40, event => {
+        this.addWidget(new Button("^", gameCanvas.width - 300, gameCanvas.height - 220, 60, 40, event => {
             this.displayPreviousServeInfo = !this.displayPreviousServeInfo;
         }));
-        this.addWidget(new Button("Reset Practice", gameCanvas.width - 220, gameCanvas.height - 240, 200, 40, event => {
+        this.addWidget(new Button("Reset Practice", gameCanvas.width - 220, gameCanvas.height - 220, 200, 40, event => {
             if (this.gameStateHandler.getGameState())
                 this.gameStateHandler.getGameState().resetGameInfo();
         }, "24px \"Verdana\""));
@@ -24,7 +24,7 @@ export class PracticeScreen extends MainGameplayScreen {
         if (this.displayPreviousServeInfo) {
             let previousServeInfo = gameState.getPreviousServeInfo();
             let previousServeInfoX = gameCanvas.width - 300;
-            let previousServeInfoY = gameCanvas.height - 490;
+            let previousServeInfoY = gameCanvas.height - 470;
             ctx.fillStyle = Colors.COFFEE_BROWN;
             ctx.beginPath();
             ctx.roundRect(previousServeInfoX, previousServeInfoY, 280, 230, 20);

@@ -159,7 +159,7 @@ export class MainGameplayScreen extends BaseScreen {
 
     renderGameInfo(gameCanvas, ctx, dt, gameState) {
         let serveInfoX = gameCanvas.width - 300;
-        let serveInfoY = gameCanvas.height - 184;
+        let serveInfoY = gameCanvas.height - 160;
         ctx.fillStyle = Colors.COFFEE_BROWN;
         ctx.beginPath();
         ctx.roundRect(serveInfoX, serveInfoY, 280, 140, 20);
