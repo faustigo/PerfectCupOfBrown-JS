@@ -38,8 +38,10 @@ export class PauseScreen extends BaseScreen {
     }
 
     onKeyDown(event) {
-        if (event.keyCode === 27 && this.gameStateHandler.getGameState())
+        if (event.keyCode === 27 && this.gameStateHandler.getGameState()) {
             this.gameStateHandler.getGameState().setPaused(false);
+            this.parentScreen.clearHovering();
+        }
     }
 
 }
