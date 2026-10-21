@@ -8,12 +8,12 @@ import { BaseGameState } from "../gameplay/base_game_state.js";
 
 export class TitleScreen extends BaseScreen {
 
-    constructor(stateSetter) {
-        super(stateSetter);
+    constructor(gameStateHandler) {
+        super(gameStateHandler);
         const gameCanvas = document.getElementById("gameCanvas");
         this.addWidget(new Button("Let's Pour!", gameCanvas.width / 2 - 120, 240, 240, 80, event => {
-            this.stateSetter.setScreen(new MainGameplayScreen(this.stateSetter));
-            this.stateSetter.setGameState(new BaseGameState());
+            this.gameStateHandler.setScreen(new MainGameplayScreen(this.gameStateHandler));
+            this.gameStateHandler.setGameState(new BaseGameState());
         }));
     }
 

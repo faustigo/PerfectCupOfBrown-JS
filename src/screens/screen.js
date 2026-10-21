@@ -1,7 +1,7 @@
 export class BaseScreen {
 
-    constructor(stateSetter) {
-        this.stateSetter = stateSetter;
+    constructor(gameStateHandler) {
+        this.gameStateHandler = gameStateHandler;
         this.widgets = [];
     }
 

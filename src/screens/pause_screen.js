@@ -7,18 +7,21 @@ import * as Colors from "../colors.js";
 
 export class PauseScreen extends BaseScreen {
     
-    constructor(stateSetter, parentScreen) {
-        super(stateSetter);
+    constructor(gameStateHandler, parentScreen) {
+        super(gameStateHandler);
 
         this.parentScreen = parentScreen;
  
         const gameCanvas = document.getElementById("gameCanvas");
         this.addWidget(new Button("Resume", gameCanvas.width / 2 - 120, 90, 240, 80, event => {
-            this.parentScreen.setPaused(false);
+            if (this.gameStateHandler.getGameState()) {
+                this.gameStateHandler.getGameState().setPaused(false);
+                this.clearHovering();
+            }
         }));
         this.addWidget(new Button("Main Menu", gameCanvas.width / 2 - 120, 230, 240, 80, event => {
-            this.stateSetter.setScreen(new TitleScreen(this.stateSetter));
-            this.stateSetter.setGameState(null);
+            this.gameStateHandler.setScreen(new TitleScreen(this.gameStateHandler));
+            this.gameStateHandler.setGameState(null);
         }));
         this.addWidget(new Button("Help", gameCanvas.width / 2 - 120, 370, 240, 80, event => {
             // TODO help button
@@ -35,8 +38,8 @@ export class PauseScreen extends BaseScreen {
     }
 
     onKeyDown(event) {
-        if (event.keyCode === 27)
-            this.parentScreen.setPaused(false);
+        if (event.keyCode === 27 && this.gameStateHandler.getGameState())
+            this.gameStateHandler.getGameState().setPaused(false);
     }
 
 }

@@ -7,7 +7,7 @@ const TIMER = new Timer(60, mainloop);
 let CURRENT_SCREEN = null;
 let CURRENT_GAME_STATE = null;
 
-class StateSetter {
+class GameStateHandler {
     setScreen(screen) {
         CURRENT_SCREEN = screen;
     }
@@ -21,7 +21,7 @@ class StateSetter {
     }
 }
 
-const STATE_SETTER = new StateSetter();
+const GAME_STATE_HANDLER = new GameStateHandler();
 
 function main() {
     const gameCanvas = document.getElementById("gameCanvas");
@@ -41,7 +41,7 @@ function main() {
         if (CURRENT_SCREEN)
             CURRENT_SCREEN.onKeyUp(event);
     })
-    STATE_SETTER.setScreen(new LoadingScreen(STATE_SETTER));
+    GAME_STATE_HANDLER.setScreen(new LoadingScreen(GAME_STATE_HANDLER));
     TIMER.start();
 }
 

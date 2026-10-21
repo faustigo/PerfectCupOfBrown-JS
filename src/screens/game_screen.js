@@ -7,34 +7,48 @@ import * as Colors from "../colors.js";
 
 export class MainGameplayScreen extends BaseScreen {
     
-    hoverPct = 0.0;
-    coffeeFillPct = 0.0;
+    cycleTime = 0.0;
 
-    constructor(stateSetter) {
-        super(stateSetter);
+    constructor(gameStateHandler) {
+        super(gameStateHandler);
 
-        this.paused = false;
-        this.pauseScreen = new PauseScreen(stateSetter, this);
+        this.pauseScreen = new PauseScreen(this.gameStateHandler, this);
         
         const gameCanvas = document.getElementById("gameCanvas");
         this.addWidget(new Button("||", 20, 20, 60, 60, event => {
-            this.setPaused(true);
+            if (this.gameStateHandler.getGameState())
+                this.gameStateHandler.getGameState().setPaused(true);
         }));
     }
 
     render(gameCanvas, ctx, dt) {
+        let gameState = this.gameStateHandler.getGameState();
+        let paused = this.isPaused();
+        const CYCLE_SPEED = 1.0;
+        const MARKER_DASH_LENGTH = 20;
+        const MARKER_DASHES = 30;
+        if (!paused) {
+            this.cycleTime += dt;
+            this.cycleTime %= CYCLE_SPEED;
+        }
         ctx.drawImage(Assets.COUNTER_BG, 0, 0, gameCanvas.width, gameCanvas.height);
 
-        // TODO serve animation
         let cupX = gameCanvas.width / 2;
         let cupY = 400;
-        // TODO actual values from game state
-        let shadePct = this.hoverPct;
-        let coffeeFillPct = this.coffeeFillPct;
-        let coffeeShade = Colors.coffeeColor(shadePct);
-        let coffeeHeight = 205 * coffeeFillPct;
-        let coffeeRadiusX = 88 + (115 - 88) * coffeeFillPct;
-        let coffeeRadiusY = 73 + (95 - 73) * coffeeFillPct;
+
+        let milkProportion = 0.0;
+        let coffeeFillProportion = 0.0;
+        if (gameState) {
+            milkProportion = gameState.getMilkProportion();
+            coffeeFillProportion = gameState.getFilledProportion();
+            let offsetProportion = gameState.getCupYOffsetFraction();
+            cupY += Math.floor(500 * offsetProportion);
+        }
+
+        let coffeeShade = Colors.coffeeColor(milkProportion);
+        let coffeeHeight = 125 * coffeeFillProportion;
+        let coffeeRadiusX = 88 + (110 - 88) * coffeeFillProportion;
+        let coffeeRadiusY = 80 + (100 - 80) * coffeeFillProportion;
 
         // Draw base
         // Inside wall
@@ -43,27 +57,45 @@ export class MainGameplayScreen extends BaseScreen {
         insideGradient.addColorStop(1, Colors.PAPER_CUP_OFF_WHITE_3);
         ctx.fillStyle = insideGradient;
         ctx.beginPath();
-        ctx.ellipse(cupX, cupY - 230, 115, 100, 0, 0, Math.PI * 2);
+        ctx.ellipse(cupX, cupY - 150, 115, 105, 0, 0, Math.PI * 2);
         ctx.fill();
+        // Floor
+        ctx.fillStyle = Colors.PAPER_CUP_OFF_WHITE_2;
+        ctx.beginPath();
+        ctx.ellipse(cupX, cupY, 90, 83, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = Colors.PAPER_CUP_OFF_WHITE_3;
+        ctx.setLineDash([]);
+        ctx.beginPath();
+        ctx.ellipse(cupX, cupY, 90, 83, 0, 0, Math.PI, true);
+        ctx.stroke();
         // Marker
         ctx.lineWidth = 2;
         ctx.strokeStyle = Colors.PAPER_CUP_SHADE_1;
+        let dashes = [Math.floor(this.cycleTime / CYCLE_SPEED * MARKER_DASH_LENGTH * 2)];
+        if (dashes[0] > MARKER_DASH_LENGTH) {
+            let remainder = dashes[0] - MARKER_DASH_LENGTH;
+            dashes[0] = 0;
+            dashes.push(remainder);
+            dashes.push(MARKER_DASH_LENGTH);
+        }
+        for (let i = 0; i < MARKER_DASHES; ++i)
+            dashes.push(MARKER_DASH_LENGTH);
+        ctx.setLineDash(dashes);
         ctx.beginPath();
-        ctx.ellipse(cupX, cupY - 205, 115, 95, 0, 0, Math.PI, true);
+        ctx.ellipse(cupX, cupY - 125, 110, 100, 0, Math.PI, 0, false);
         ctx.stroke();
-        // Rim, back
-        ctx.lineWidth = 10;
-        ctx.strokeStyle = Colors.PAPER_CUP_WHITE;
-        ctx.beginPath();
-        ctx.ellipse(cupX, cupY - 230, 120, 100, 0, 0, Math.PI, true);
-        ctx.stroke();
+        ctx.setLineDash([]);
         
-        // Draw coffee with interpolated shade
-        // TODO sizing and positioning coffee correctly in accordance with game logic
-        ctx.fillStyle = coffeeShade;
-        ctx.beginPath();
-        ctx.ellipse(cupX, cupY - coffeeHeight, coffeeRadiusX, coffeeRadiusY, 0, 0, Math.PI * 2);
-        ctx.fill();
+        // Draw coffee if not overflowing
+        let overflowing = coffeeHeight > 150;
+        if (!overflowing && coffeeHeight > 1e-2) {
+            ctx.fillStyle = coffeeShade;
+            ctx.beginPath();
+            ctx.ellipse(cupX, cupY - coffeeHeight, coffeeRadiusX, coffeeRadiusY, 0, 0, Math.PI * 2);
+            ctx.fill();
+        }
 
         // Draw top
         // Cup body
@@ -73,26 +105,35 @@ export class MainGameplayScreen extends BaseScreen {
         outsideGradient.addColorStop(1, Colors.PAPER_CUP_OFF_WHITE_3);
         ctx.fillStyle = outsideGradient;
         ctx.beginPath();
-        ctx.ellipse(cupX, cupY - 230, 120, 100, 0, 0, Math.PI);
+        ctx.ellipse(cupX, cupY - 150, 120, 110, 0, 0, Math.PI);
         ctx.lineTo(cupX - 90, cupY);
-        ctx.ellipse(cupX, cupY, 90, 75, 0, Math.PI, 0, true);
-        ctx.lineTo(cupX + 120, cupY - 230);
+        ctx.ellipse(cupX, cupY, 90, 83, 0, Math.PI, 0, true);
+        ctx.lineTo(cupX + 120, cupY - 150);
         ctx.fill();
         ctx.lineWidth = 2;
         ctx.strokeStyle = Colors.PAPER_CUP_OFF_WHITE_3;
         ctx.beginPath();
-        ctx.ellipse(cupX, cupY - 10, 90, 75, 0, 0.15, Math.PI-0.15, false);
+        ctx.ellipse(cupX, cupY - 10, 90, 83, 0, 0.15, Math.PI-0.15, false);
         ctx.stroke();
-        // Rim, front
+        // Rim
         ctx.lineWidth = 10;
         ctx.strokeStyle = Colors.PAPER_CUP_OFF_WHITE_3;
         ctx.beginPath();
-        ctx.ellipse(cupX, cupY - 225, 120, 100, 0, 0, Math.PI, false);
+        ctx.ellipse(cupX, cupY - 145, 120, 110, 0, 0, Math.PI, false);
         ctx.stroke();
         ctx.strokeStyle = Colors.PAPER_CUP_WHITE;
         ctx.beginPath();
-        ctx.ellipse(cupX, cupY - 230, 120, 100, 0, 0, Math.PI, false);
+        ctx.ellipse(cupX, cupY - 150, 120, 110, 0, 0, Math.PI * 2);
         ctx.stroke();
+        
+        // Draw coffee if overflowing
+        if (overflowing) {
+            let overflowRadius = Math.min(coffeeHeight - 150, 16);
+            ctx.fillStyle = coffeeShade;
+            ctx.beginPath();
+            ctx.ellipse(cupX, cupY - 150, 115 + overflowRadius, 105 + overflowRadius, 0, 0, Math.PI * 2);
+            ctx.fill();
+        }
 
         // TODO render timer
 
@@ -105,51 +146,44 @@ export class MainGameplayScreen extends BaseScreen {
 
         super.render(gameCanvas, ctx, dt);
 
-        if (this.paused)
+        if (paused)
             this.pauseScreen.render(gameCanvas, ctx, dt);
     }
 
-    setPaused(paused) {
-        this.paused = paused;
-        if (this.paused) {
-            this.clearHovering();
-        } else {
-            this.pauseScreen.clearHovering();
-        }
-    }
-
     onClick(event) {
-        if (super.onClick(event))
-            return;
-        if (this.paused)
-            this.pauseScreen.onClick(event);
+        if (this.isPaused())
+            return this.pauseScreen.onClick(event);
+        return super.onClick(event);
     }
 
     setHovered(event) {
-        if (this.paused) {
+        if (this.isPaused()) {
             this.pauseScreen.setHovered(event);
-        } else {
-            super.setHovered(event);
-            // TODO remove
-            this.hoverPct = event.clientX / 960;
-            this.coffeeFillPct = (1 - event.clientY / 540) * (230 / 205);
+            return;
         }
+        super.setHovered(event);
     }
 
     onKeyDown(event) {
-        if (this.paused) {
+        if (this.isPaused()) {
             this.pauseScreen.onKeyDown(event);
             return;
         }
-        if (event.keyCode === 27)
-            this.setPaused(true);
+        if (this.gameStateHandler.getGameState())
+            this.gameStateHandler.getGameState().onKeyDown(event);
     }
 
     onKeyUp(event) {
-        if (this.paused) {
+        if (this.isPaused()) {
             this.pauseScreen.onKeyUp(event);
             return;
         }
+        if (this.gameStateHandler.getGameState())
+            this.gameStateHandler.getGameState().onKeyUp(event);
+    }
+
+    isPaused() {
+        return this.gameStateHandler.getGameState() && this.gameStateHandler.getGameState().isPaused();
     }
 
 }

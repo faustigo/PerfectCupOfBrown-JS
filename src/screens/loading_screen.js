@@ -4,8 +4,8 @@ import * as Assets from "../asset_index.js";
 
 export class LoadingScreen extends BaseScreen {
 
-    constructor(stateSetter) {
-        super(stateSetter);
+    constructor(gameStateHandler) {
+        super(gameStateHandler);
     }
 
     render(gameCanvas, ctx, dt) {
@@ -18,7 +18,7 @@ export class LoadingScreen extends BaseScreen {
         ctx.textBaseline = "middle";
         ctx.fillText(`Loading ${loaded_assets}/${total_assets}...`, gameCanvas.width / 2, gameCanvas.height / 2);
         if (loaded_assets === total_assets)
-            this.stateSetter.setScreen(new TitleScreen(this.stateSetter));
+            this.gameStateHandler.setScreen(new TitleScreen(this.gameStateHandler));
     }
 
 }
