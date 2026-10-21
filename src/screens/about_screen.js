@@ -7,6 +7,7 @@ import * as Colors from "../colors.js";
 
 const ABOUT_TEXT = [
     "A Perfect Cup of Brown",
+    "v1.0.0",
     "",
     "Created and programmed by faustigo",
     "2026. All Rights Reserved."
