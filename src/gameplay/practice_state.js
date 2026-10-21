@@ -54,4 +54,10 @@ export class PracticeState extends BaseGameState {
         this.action = ACTION_NEW_CUP;
     }
 
+    getHelpLines() {
+        let lines = super.getHelpLines();
+        lines.push("Practice your coffee pouring skills! There is no game over in Practice.");
+        return lines;
+    }
+
 }

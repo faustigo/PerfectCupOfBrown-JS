@@ -45,7 +45,7 @@ export class PerfectPourScreen extends MainGameplayScreen {
         ctx.textBaseline = "alphabetical";
         ctx.font = "24px \"Verdana\"";
         ctx.textAlign = "left";
-        ctx.fillText("Error remaining", errorRemainingX + 20, errorRemainingY + 20);
+        ctx.fillText("Error Remaining", errorRemainingX + 20, errorRemainingY + 20);
         ctx.font = "36px \"Verdana\"";
         ctx.fillText(`${gameState.getErrorRemaining()}`, errorRemainingX + 20, errorRemainingY + 60);
         

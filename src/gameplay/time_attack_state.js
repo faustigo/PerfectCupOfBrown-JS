@@ -70,25 +70,12 @@ export class TimeAttackState extends BaseGameState {
     }
 
     getHelpLines() {
-        return [
-            "Controls",
-            "",
-            "<C> - pour coffee   <M> - pour milk",
-            "<S> - serve cup     <D> - discard cup",
-            "<Escape> - Pause Menu/Unpause",
-            "---",
-            "How to Play",
-            "",
-            "Pour coffee and milk into the coffee cup.",
-            "The proportion of coffee and milk poured will change the color.",
-            "Try to match the shade of coffee shown, fill to the dashed line,",
-            "  and pour as quickly as possible.",
-            "More points are rewarded for pouring accurately and fast.",
-            "Points can be deducted for under- or overfilling the cup,",
-            "or serving a much different shade of coffee.",
+        let lines = super.getHelpLines();
+        lines.push(
             "Serve as much coffee as possible in the given time.",
-            "Gain additional time by serving perfect coffees fast."
-        ];
+            "Gain additional time by serving perfect coffees fast.",
+            "The game ends when the timer runs out.");
+        return lines;
     }
 
     onKeyDown(event) {

@@ -52,25 +52,14 @@ export class PerfectPourState extends BaseGameState {
     }
 
     getHelpLines() {
-        return [
-            "Controls",
-            "",
-            "<C> - pour coffee   <M> - pour milk",
-            "<S> - serve cup     <D> - discard cup",
-            "<Escape> - Pause Menu/Unpause",
-            "---",
-            "How to Play",
-            "",
-            "Pour coffee and milk into the coffee cup. The amount of each poured",
-            "  will change the color. Fill to the dashed line.",
-            "More points are rewarded for pouring accurately and fast.",
-            "Points can be deducted for not meeting the shade or fill line.",
+        let lines = super.getHelpLines();
+        lines.push(
             "Serve as many coffee cups as perfectly as possible.",
             "Only cups scoring at least 80 points are counted.",
             "The Error Remaining score decreases when cups score below 100,",
             "  or when a cup is discarded.",
-            "The game ends when the Error Remaining score reaches 0."
-        ];
+            "The game ends when the Error Remaining score reaches 0.");
+        return lines;
     }
 
     onKeyDown(event) {

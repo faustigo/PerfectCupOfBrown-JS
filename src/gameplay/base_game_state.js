@@ -274,13 +274,10 @@ export class BaseGameState {
             "---",
             "How to Play",
             "",
-            "Pour coffee and milk into the coffee cup.",
-            "The proportion of coffee and milk poured will change the color.",
-            "Try to match the shade of coffee shown, fill to the dashed line,",
-            "  and pour as quickly as possible.",
+            "Pour coffee and milk into the coffee cup. The amount of each poured",
+            "  will change the color. Fill to the dashed line.",
             "More points are rewarded for pouring accurately and fast.",
-            "Points can be deducted for under- or overfilling the cup,",
-            "or serving a much different shade of coffee."
+            "Points can be deducted for not meeting the shade or fill line."
         ];
     }
 
