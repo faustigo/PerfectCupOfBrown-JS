@@ -1,4 +1,4 @@
-import { BaseGameState } from "./base_game_state.js";
+import { BaseGameState, ACTION_NEW_CUP } from "./base_game_state.js";
 
 
 export class PracticeState extends BaseGameState {

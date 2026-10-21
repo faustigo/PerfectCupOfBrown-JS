@@ -1,9 +1,9 @@
 const COFFEE_TARGET = 100.0;
 
-const ACTION_NOTHING = 0;
-const ACTION_SERVE = 1;
-const ACTION_DISPOSE = 2;
-const ACTION_NEW_CUP = 3;
+export const ACTION_NOTHING = 0;
+export const ACTION_SERVE = 1;
+export const ACTION_DISPOSE = 2;
+export const ACTION_NEW_CUP = 3;
 
 const SERVE_TIME = 1.0;
 const DISPOSE_TIME = 1.0;
@@ -66,19 +66,30 @@ export class BaseGameState {
         let proportionErrorRaw = this.getMilkProportion() - this.targetRatio;
         if (this.coffeeAmount + this.milkAmount < 1e-2)
             proportionErrorRaw = -1.0;
+
         let fillErrorAbs = Math.abs(fillErrorRaw);
         let proportionErrorAbs = Math.abs(proportionErrorRaw);
+
+        // Punish fill error greatly (including subtraction) when error is under -10% or over +5%
+        let fillFactor = fillErrorRaw < -0.10 ? Math.max(-0.5, (1 - fillErrorAbs*2)**3) :
+                          fillErrorRaw > 0.05 ? Math.max(-0.5, (1 - fillErrorAbs*6)**3) :
+                                                Math.max(0, (1 - fillErrorAbs)**3); // Normal fill punishment around [-10%, +5%], no subtraction
+        let proportionFactor = Math.max(-1, (1 - proportionErrorAbs*4)**3);
+        if (proportionFactor < 0 && fillFactor < 0) // Preserve penalty sign and avoid double negative
+            proportionFactor *= -1;
+        // Explainer for time factor:
+        // this.serveTime - 30 => Start penalizing performance after 30 seconds
+        // Math.exp(- " /30)   => Penalize performance according to an exponential decay (~36% @ 60s, ~5% @ 120s)
+        // Math.min(1.5, ")    => At most x1.5 score for finishing early
+        // Math.round(" * 100) / 100 => Round time factor to nearest 0.01
+        let timeFactor = Math.round(Math.min(1.5, Math.exp(-(this.serveTime-30)/30)) * 100) / 100;
+
         return {
             fillError: fillErrorRaw,
             proportionError: proportionErrorRaw,
-            fillFactor: fillError > 0.05 ? Math.max(0, (1 - fillErrorAbs*2)**3) : Math.max(0, (1 - fillErrorAbs)**3),
-            proportionFactor: Math.max(0, (1 - proportionErrorAbs)**3),
-            // Explainer for time factor:
-            // this.serveTime - 30 => Start penalizing performance after 30 seconds
-            // Math.exp(- " /30)   => Penalize performance according to an exponential decay (~36% @ 60s, ~5% @ 120s)
-            // Math.min(1.5, ")    => At most x1.5 score for finishing early
-            // Math.round(" * 100) / 100 => Round time factor to nearest 0.01
-            timeFactor: Math.round(Math.min(1.5, Math.exp(-(this.serveTime-30)/30)) * 100) / 100,
+            fillFactor: fillFactor,
+            proportionFactor: proportionFactor,
+            timeFactor: timeFactor
         };
     }
 
@@ -120,12 +131,50 @@ export class BaseGameState {
         }
         if (this.action !== ACTION_SERVE)
             this.serveTime += dt;
-        if (this.action === ACTION_NOTHING) {
+        if (this.action === ACTION_NOTHING && (this.pouringCoffee || this.pouringMilk)) {
+            let addedCoffee = 0.0;
+            let addedMilk = 0.0;
+            
             // TODO rate of pouring
             if (this.pouringCoffee)
-                this.coffeeAmount += 10.0 * dt;
+                addedCoffee = 10.0 * dt;
             if (this.pouringMilk)
-                this.milkAmount += 10.0 * dt;
+                addedMilk = 10.0 * dt;
+
+            let totalOldFluid = this.coffeeAmount + this.milkAmount;
+            let totalNewFluid = addedCoffee + addedMilk;
+            let OVERFLOW_LIMIT = COFFEE_TARGET * 166 / 125; // Ratio taken from visual coffee overflow (screens/game_screen.js)
+            if (totalOldFluid + totalNewFluid <= OVERFLOW_LIMIT) {
+                // Old fluid and new fluid combined is under coffee target
+                // Simple fluid addition
+                this.coffeeAmount += addedCoffee;
+                this.milkAmount += addedMilk;
+            } else if (totalNewFluid > OVERFLOW_LIMIT) {
+                // New fluid exceeds overflow limit and replaces all contents immediately
+                // Add the new fluid, but scaled
+                let scaling = OVERFLOW_LIMIT / totalNewFluid;
+                this.coffeeAmount = addedCoffee * scaling;
+                this.milkAmount = addedMilk * scaling;
+            } else {
+                // Substantial amount of old fluid
+                // First, add incoming concentration to fill in remainder of cup before overflowing
+                let newCoffeeConcentration = addedCoffee / totalNewFluid;
+                let newMilkConcentration = addedMilk / totalNewFluid;
+                let oldFluidGap = OVERFLOW_LIMIT - totalOldFluid;
+                this.coffeeAmount += oldFluidGap * newCoffeeConcentration;
+                this.milkAmount += oldFluidGap * newMilkConcentration;
+
+                totalNewFluid -= oldFluidGap; // Get remainder of incoming fluid that isn't added
+                let oldCoffeeConcentration = this.coffeeAmount / totalOldFluid; 
+                let oldMilkConcentration = this.milkAmount / totalOldFluid; 
+                 
+                // Displace amount of old concentration equivalent to remainder incoming fluid, then
+                // add remainder incoming fluid with the new concentration
+                // (Old fluid) - (old fluid concentration)*(new fluid amount) + (new fluid concentration)*(new fluid amount)
+                // = (Old fluid) + ((new fluid concentration) - (old fluid concentration))*(new fluid amount)
+                this.coffeeAmount = Math.max(0, this.coffeeAmount + (newCoffeeConcentration - oldCoffeeConcentration)*totalNewFluid);
+                this.milkAmount = Math.max(0, this.milkAmount + (newMilkConcentration - oldMilkConcentration)*totalNewFluid);
+            }
         }
     }
 
