@@ -75,15 +75,14 @@ export class BaseGameState {
         let fillFactor = fillErrorRaw < -0.10 ? Math.max(-1, Math.min(1, (1 - fillErrorAbs*2)**3)) :
                           fillErrorRaw > 0.05 ? Math.max(-1, Math.min(1, (1 - fillErrorAbs*6)**3)) :
                                                 Math.max(0, Math.min(1, (1 - fillErrorAbs)**3));
-        fillFactor *= 0.75;
-        let proportionFactor = 0.25 * Math.max(-1, (1 - proportionErrorAbs*4)**3);
+        fillFactor *= 0.5;
+        let proportionFactor = 0.5 * Math.max(-2, (1 - proportionErrorAbs*4)**3);
         // Explainer for time factor:
-        // this.serveTime - 31.5 => Start penalizing performance after 31 seconds (max benefits if time < 10s)
-        // Math.exp(- " /30)-1 => Penalize performance according to an exponential decay (~-30% @ 60s, ~-47% @ 120s)
-        // Math.min(1, ")      => At most x1 factor for finishing early
+        // this.serveTime-16.5 => Start penalizing performance after 16.5 seconds
+        // Math.exp(- " /30)-1 => Penalize performance according to an exponential decay
+        // Math.min(0.25, ")   => At most +25% factor for finishing early
         // Math.round(" * 100) / 100 => Round time factor to nearest 0.01
-        // 0.5 * "             => Time factor is in range [-0.5, 0.5]
-        let timeFactor = 0.25 * Math.round(Math.min(1, Math.exp(-(this.serveTime-31)/30)-1) * 100) / 100;
+        let timeFactor = Math.round(Math.min(0.25, Math.exp(-(this.serveTime-16.5)/30)-1) * 100) / 100;
 
         return {
             fillError: fillErrorRaw,
