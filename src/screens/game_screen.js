@@ -51,6 +51,13 @@ export class MainGameplayScreen extends BaseScreen {
         let coffeeRadiusY = 80 + (100 - 80) * coffeeFillProportion;
 
         // Draw base
+        // Shadow
+        ctx.fillStyle = Colors.PAPER_CUP_SHADE_1;
+        ctx.globalAlpha = 0.5;
+        ctx.beginPath();
+        ctx.ellipse(cupX, cupY, 105, 100, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1.0;
         // Inside wall
         let insideGradient = ctx.createLinearGradient(cupX - 120, cupY, cupX + 120, cupY);
         insideGradient.addColorStop(0, Colors.PAPER_CUP_OFF_WHITE_1);
@@ -84,7 +91,7 @@ export class MainGameplayScreen extends BaseScreen {
             dashes.push(MARKER_DASH_LENGTH);
         ctx.setLineDash(dashes);
         ctx.beginPath();
-        ctx.ellipse(cupX, cupY - 125, 110, 100, 0, Math.PI, 0, false);
+        ctx.ellipse(cupX, cupY - 125, 110, 100, 0, Math.PI-0.1, 0.1, false);
         ctx.stroke();
         ctx.setLineDash([]);
         
