@@ -142,14 +142,38 @@ export class MainGameplayScreen extends BaseScreen {
             ctx.fill();
         }
 
+        // TODO draw coffee and milk jugs when pouring?
+
+
         // TODO render timer
 
         
         // TODO render score
 
 
-        // TODO render customer request
-        
+        // Render customer request
+        if (gameState) {
+            let matchLabelX = 100;
+            let matchLabelY = gameCanvas.height / 2 - 40;
+            ctx.fillStyle = Colors.COFFEE_BROWN;
+            ctx.beginPath();
+            ctx.roundRect(matchLabelX, matchLabelY, 230, 80, 20);
+            ctx.fill();
+            ctx.fillStyle = "white";
+            ctx.font = "36px \"Verdana\"";
+            ctx.textAlign = "left";
+            ctx.textBaseline = "middle";
+            ctx.fillText("Match: ", matchLabelX + 20, matchLabelY + 40);
+
+            ctx.beginPath();
+            ctx.roundRect(matchLabelX + 155, matchLabelY + 5, 70, 70, 15);
+            ctx.fill();
+
+            ctx.fillStyle = Colors.coffeeColor(gameState.getTargetProportion());  
+            ctx.beginPath();
+            ctx.roundRect(matchLabelX + 160, matchLabelY + 10, 60, 60, 10);
+            ctx.fill();
+        }
 
         super.render(gameCanvas, ctx, dt);
 

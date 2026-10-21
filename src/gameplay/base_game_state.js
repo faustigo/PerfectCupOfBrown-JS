@@ -16,7 +16,7 @@ export class BaseGameState {
     coffeeAmount = 0.0;
     milkAmount = 0.0;
     serveTime = 0.0;
-    targetRatio = 0.0;
+    targetRatio = this.generateRandomTarget();
     paused = false;
 
     pouringCoffee = false;
@@ -57,6 +57,20 @@ export class BaseGameState {
     }
 
     calculateScoreOfCup() {
+        // TODO calculations for gamemodes
+        let fillFactor = this.coffeeAmount + this.milkAmount;
+        let ratioFactor = this.getMilkProportion();
+        let fillError = (fillFactor - COFFEE_TARGET) / COFFEE_TARGET;
+        let ratioError = ratioFactor - this.targetRatio;
+        console.log(`Fill Amount=${fillFactor}, error=${fillError}; Ratio=${ratioFactor}, Actual Ratio=${this.targetRatio}, error=${ratioError}`);
+    }
+
+    getScore() {
+        return this.score;
+    }
+
+    getTargetProportion() {
+        return this.targetRatio;
     }
 
     tick(dt) {
@@ -68,6 +82,7 @@ export class BaseGameState {
                 this.actionTime = 0;
                 this.action = ACTION_NEW_CUP;
                 this.resetCup();
+                this.targetRatio = this.generateRandomTarget();
             }
         } else if (this.action === ACTION_DISPOSE) {
             this.actionTime += dt;
@@ -168,6 +183,7 @@ export class BaseGameState {
         this.actionTime = 0;
         this.serveTime = 0;
         this.action = ACTION_SERVE;
+        this.calculateScoreOfCup();
     }
 
     disposeCoffee() {
@@ -175,6 +191,10 @@ export class BaseGameState {
             return;
         this.actionTime = 0;
         this.action = ACTION_DISPOSE;
+    }
+
+    generateRandomTarget() {
+        return Math.random() * 0.8; // Avoid milk-heavy drinks
     }
 
 }
