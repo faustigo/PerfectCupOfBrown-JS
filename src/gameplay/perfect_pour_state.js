@@ -17,7 +17,7 @@ export class PerfectPourState extends BaseGameState {
         let scalar = Math.max(-1, scoreFactors.fillFactor + scoreFactors.proportionFactor + scoreFactors.timeFactor); 
         let points = Math.round(100 * scalar);
         this.lastCupScore = `${points}/100`;
-        if (points >= 80) // Award cup served if it is at least this criteria
+        if (points >= 50) // Award cup served if it is at least this criteria
             ++this.score;
         
         let error = Math.max(0, 100 - points);
@@ -55,7 +55,7 @@ export class PerfectPourState extends BaseGameState {
         let lines = super.getHelpLines();
         lines.push(
             "Serve as many coffee cups as perfectly as possible.",
-            "Only cups scoring at least 80 points are counted.",
+            "Only cups scoring at least 50 points are counted.",
             "The Error Remaining score decreases when cups score below 100,",
             "  or when a cup is discarded.",
             "The game ends when the Error Remaining score reaches 0.");
