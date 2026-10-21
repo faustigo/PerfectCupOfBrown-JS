@@ -103,6 +103,21 @@ export class MainGameplayScreen extends BaseScreen {
             ctx.ellipse(cupX, cupY - coffeeHeight, coffeeRadiusX, coffeeRadiusY, 0, 0, Math.PI * 2);
             ctx.fill();
         }
+        
+        // Upper rim
+        ctx.lineWidth = 10;
+        ctx.strokeStyle = Colors.PAPER_CUP_OFF_WHITE_3;
+        ctx.beginPath();
+        ctx.ellipse(cupX, cupY - 145, 120, 110, 0, 0, Math.PI, false);
+        ctx.stroke();
+        ctx.strokeStyle = Colors.PAPER_CUP_WHITE;
+        ctx.beginPath();
+        ctx.ellipse(cupX, cupY - 150, 120, 110, 0, 0, Math.PI, true);
+        ctx.stroke();
+
+        // Draw pouring below if not overflowing
+        if (gameState && !overflowing)
+            this.renderPouring(gameCanvas, ctx, dt, gameState, cupX, cupY, coffeeHeight);
 
         // Draw top
         // Cup body
@@ -122,7 +137,7 @@ export class MainGameplayScreen extends BaseScreen {
         ctx.beginPath();
         ctx.ellipse(cupX, cupY - 10, 90, 83, 0, 0.15, Math.PI-0.15, false);
         ctx.stroke();
-        // Rim
+        // Lower rim
         ctx.lineWidth = 10;
         ctx.strokeStyle = Colors.PAPER_CUP_OFF_WHITE_3;
         ctx.beginPath();
@@ -130,7 +145,7 @@ export class MainGameplayScreen extends BaseScreen {
         ctx.stroke();
         ctx.strokeStyle = Colors.PAPER_CUP_WHITE;
         ctx.beginPath();
-        ctx.ellipse(cupX, cupY - 150, 120, 110, 0, 0, Math.PI * 2);
+        ctx.ellipse(cupX, cupY - 150, 120, 110, 0, 0, Math.PI);
         ctx.stroke();
         
         // Draw coffee if overflowing
@@ -140,10 +155,9 @@ export class MainGameplayScreen extends BaseScreen {
             ctx.beginPath();
             ctx.ellipse(cupX, cupY - 150, 115 + overflowRadius, 105 + overflowRadius, 0, 0, Math.PI * 2);
             ctx.fill();
+            if (gameState) // Draw pouring over overflow
+                this.renderPouring(gameCanvas, ctx, dt, gameState, cupX, cupY, coffeeHeight);
         }
-
-        // TODO draw coffee and milk jugs when pouring?
-
 
         // Render game state-dependent info
         if (gameState) {
@@ -196,6 +210,25 @@ export class MainGameplayScreen extends BaseScreen {
         ctx.beginPath();
         ctx.roundRect(matchLabelX + 160, matchLabelY + 10, 60, 60, 10);
         ctx.fill();
+    }
+
+    renderPouring(gameCanvas, ctx, dt, gameState, cupX, cupY, coffeeHeight) {
+        let coffeePourRate = gameState.getCoffeePourRate();
+        if (coffeePourRate > 1e-4) {
+            let width = coffeePourRate;
+            ctx.fillStyle = Colors.coffeeColor(0.0);
+            ctx.beginPath();
+            ctx.roundRect(cupX - 50 - width / 2, -width, width, width + cupY - coffeeHeight, width/2);
+            ctx.fill();
+        }
+        let milkPourRate = gameState.getMilkPourRate();
+        if (milkPourRate > 1e-4) {
+            let width = milkPourRate;
+            ctx.fillStyle = Colors.coffeeColor(1.0);
+            ctx.beginPath();
+            ctx.roundRect(cupX + 50 - width / 2, -width, width, width + cupY - coffeeHeight, width/2);
+            ctx.fill();
+        }
     }
 
     onClick(event) {

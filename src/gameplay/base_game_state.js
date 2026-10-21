@@ -253,6 +253,14 @@ export class BaseGameState {
         this.pouringMilk = pouringMilk && this.action === ACTION_NOTHING;
     }
 
+    getCoffeePourRate() {
+        return this.coffeePourRate;
+    }
+
+    getMilkPourRate() {
+        return this.milkPourRate;
+    }
+
     serveCoffee() {
         if (this.action !== ACTION_NOTHING)
             return;
