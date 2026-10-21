@@ -16,7 +16,8 @@ export class PracticeState extends BaseGameState {
 
     calculateScoreOfCup() {
         let scoreFactors = this.calculateScoreFactors();
-        let points = Math.round(100 * scoreFactors.fillFactor * scoreFactors.proportionFactor * scoreFactors.timeFactor);
+        let scalar = Math.max(-1, scoreFactors.fillFactor + scoreFactors.proportionFactor + scoreFactors.timeFactor); 
+        let points = Math.round(100 * scalar);
 
         let fillPercentage = Math.round(scoreFactors.fillError * 100_00) / 100; // Display up to 0.01% accuracy
         let fillPercentageString = `${fillPercentage}%`;
