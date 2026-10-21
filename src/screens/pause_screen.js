@@ -7,30 +7,31 @@ import * as Colors from "../colors.js";
 
 export class PauseScreen extends BaseScreen {
     
-    constructor(screenSetter, parentScreen) {
-        super(screenSetter);
+    constructor(stateSetter, parentScreen) {
+        super(stateSetter);
 
         this.parentScreen = parentScreen;
  
         const gameCanvas = document.getElementById("gameCanvas");
-        this.addWidget(new Button("Resume", gameCanvas.width / 2 - 120, 60, 240, 80, event => {
+        this.addWidget(new Button("Resume", gameCanvas.width / 2 - 120, 90, 240, 80, event => {
             this.parentScreen.setPaused(false);
         }));
-        this.addWidget(new Button("Main Menu", gameCanvas.width / 2 - 120, 200, 240, 80, event => {
-            this.screenSetter(new TitleScreen(this.screenSetter));
+        this.addWidget(new Button("Main Menu", gameCanvas.width / 2 - 120, 230, 240, 80, event => {
+            this.stateSetter.setScreen(new TitleScreen(this.stateSetter));
+            this.stateSetter.setGameState(null);
         }));
-        this.addWidget(new Button("Help", gameCanvas.width / 2 - 120, 340, 240, 80, event => {
+        this.addWidget(new Button("Help", gameCanvas.width / 2 - 120, 370, 240, 80, event => {
             // TODO help button
         }));
     }
 
-    render(gameCanvas, ctx) {
+    render(gameCanvas, ctx, dt) {
         var oldGlobalAlpha = ctx.globalAlpha;
         ctx.globalAlpha = 0.75;
         ctx.fillStyle = Colors.COFFEE_BROWN_PAUSED;
         ctx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
         ctx.globalAlpha = oldGlobalAlpha;
-        super.render(gameCanvas, ctx);
+        super.render(gameCanvas, ctx, dt);
     }
 
     onKeyDown(event) {

@@ -9,7 +9,7 @@ export class Button extends Widget {
         this.textFont = textFont;
     }
 
-    render(gameCanvas, ctx) {
+    render(gameCanvas, ctx, dt) {
         ctx.fillStyle = this.isHovered() ? Colors.COFFEE_BROWN_HOVERED : Colors.COFFEE_BROWN;
         ctx.beginPath();
         ctx.roundRect(this.x, this.y, this.width, this.height, 20);

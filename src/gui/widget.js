@@ -11,7 +11,7 @@ export class Widget {
         this.hovered = false;
     }
 
-    render(gameCanvas, ctx) {
+    render(gameCanvas, ctx, dt) {
     }
 
     onClick(event) {

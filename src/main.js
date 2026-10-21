@@ -5,10 +5,23 @@ import * as Assets from "./asset_index.js";
 const TIMER = new Timer(60, mainloop);
 
 let CURRENT_SCREEN = null;
+let CURRENT_GAME_STATE = null;
 
-function setScreen(screen) {
-    CURRENT_SCREEN = screen;
+class StateSetter {
+    setScreen(screen) {
+        CURRENT_SCREEN = screen;
+    }
+
+    setGameState(gameState) {
+        CURRENT_GAME_STATE = gameState;
+    }
+
+    getGameState() {
+        return CURRENT_GAME_STATE;
+    }
 }
+
+const STATE_SETTER = new StateSetter();
 
 function main() {
     const gameCanvas = document.getElementById("gameCanvas");
@@ -28,17 +41,19 @@ function main() {
         if (CURRENT_SCREEN)
             CURRENT_SCREEN.onKeyUp(event);
     })
-    setScreen(new LoadingScreen(setScreen))
+    STATE_SETTER.setScreen(new LoadingScreen(STATE_SETTER));
     TIMER.start();
 }
 
-function mainloop() {
+function mainloop(dt) {
+    if (CURRENT_GAME_STATE)
+        CURRENT_GAME_STATE.tick(dt);
     const gameCanvas = document.getElementById("gameCanvas");
     const ctx = gameCanvas.getContext("2d");
     if (CURRENT_SCREEN) {
-        CURRENT_SCREEN.render(gameCanvas, ctx);
+        CURRENT_SCREEN.render(gameCanvas, ctx, dt);
     } else {
-        console.log("Broken game state");
+        console.log("No screen visible, stopping");
         TIMER.stop();
     }
 }

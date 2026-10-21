@@ -1,7 +1,7 @@
 export class BaseScreen {
 
-    constructor(screenSetter) {
-        this.screenSetter = screenSetter;
+    constructor(stateSetter) {
+        this.stateSetter = stateSetter;
         this.widgets = [];
     }
 
@@ -9,9 +9,9 @@ export class BaseScreen {
         this.widgets.push(widget);
     }
 
-    render(gameCanvas, ctx) {
+    render(gameCanvas, ctx, dt) {
         for (var i = 0; i < this.widgets.length; ++i)
-            this.widgets[i].render(gameCanvas, ctx);
+            this.widgets[i].render(gameCanvas, ctx, dt);
     }
 
     onClick(event) {

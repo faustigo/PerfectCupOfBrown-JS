@@ -1,7 +1,7 @@
 export class Timer {
 
     constructor(targetFPS, runnable) {
-        this.targetFPS = targetFPS | 30;
+        this.targetFPS = targetFPS || 30;
         this.runnable = runnable;
         this.interval = Math.floor(1000/this.targetFPS);
         this.timer = null;
@@ -9,7 +9,7 @@ export class Timer {
     }
 
     tick() {
-        this.runnable();
+        this.runnable(this.interval/1000);
         this.timeInit += this.interval;
         this.timer = setTimeout(this.tick.bind(this), this.timeInit - (new Date()).getTime());
     }
