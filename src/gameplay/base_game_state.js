@@ -66,11 +66,13 @@ export class BaseGameState {
         let proportionErrorRaw = this.getMilkProportion() - this.targetRatio;
         if (this.coffeeAmount + this.milkAmount < 1e-2)
             proportionErrorRaw = -1.0;
+        let fillErrorAbs = Math.abs(fillErrorRaw);
+        let proportionErrorAbs = Math.abs(proportionErrorRaw);
         return {
             fillError: fillErrorRaw,
             proportionError: proportionErrorRaw,
-            fillFactor: Math.max(0, 1 - Math.abs(fillErrorRaw)),
-            proportionFactor: Math.max(0, 1 - Math.abs(proportionErrorRaw)),
+            fillFactor: fillError > 0.05 ? Math.max(0, (1 - fillErrorAbs*2)**3) : Math.max(0, (1 - fillErrorAbs)**3),
+            proportionFactor: Math.max(0, (1 - proportionErrorAbs)**3),
             // Explainer for time factor:
             // this.serveTime - 30 => Start penalizing performance after 30 seconds
             // Math.exp(- " /30)   => Penalize performance according to an exponential decay (~36% @ 60s, ~5% @ 120s)
