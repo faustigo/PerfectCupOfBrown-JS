@@ -145,40 +145,57 @@ export class MainGameplayScreen extends BaseScreen {
         // TODO draw coffee and milk jugs when pouring?
 
 
-        // TODO render timer
-
-        
-        // TODO render score
-
-
-        // Render customer request
+        // Render game state-dependent info
         if (gameState) {
-            let matchLabelX = 100;
-            let matchLabelY = gameCanvas.height / 2 - 40;
-            ctx.fillStyle = Colors.COFFEE_BROWN;
-            ctx.beginPath();
-            ctx.roundRect(matchLabelX, matchLabelY, 230, 80, 20);
-            ctx.fill();
-            ctx.fillStyle = "white";
-            ctx.font = "36px \"Verdana\"";
-            ctx.textAlign = "left";
-            ctx.textBaseline = "middle";
-            ctx.fillText("Match: ", matchLabelX + 20, matchLabelY + 40);
-
-            ctx.beginPath();
-            ctx.roundRect(matchLabelX + 155, matchLabelY + 5, 70, 70, 15);
-            ctx.fill();
-
-            ctx.fillStyle = Colors.coffeeColor(gameState.getTargetProportion());  
-            ctx.beginPath();
-            ctx.roundRect(matchLabelX + 160, matchLabelY + 10, 60, 60, 10);
-            ctx.fill();
+            this.renderGameInfo(gameCanvas, ctx, dt, gameState);
+            this.renderCustomerRequest(gameCanvas, ctx, dt, gameState);
         }
 
         super.render(gameCanvas, ctx, dt);
 
         if (paused)
             this.pauseScreen.render(gameCanvas, ctx, dt);
+    }
+
+    renderGameInfo(gameCanvas, ctx, dt, gameState) {
+        let serveInfoX = gameCanvas.width - 300;
+        let serveInfoY = gameCanvas.height - 184;
+        ctx.fillStyle = Colors.COFFEE_BROWN;
+        ctx.beginPath();
+        ctx.roundRect(serveInfoX, serveInfoY, 280, 140, 20);
+        ctx.fill();
+        ctx.fillStyle = "white";
+        ctx.font = "24px \"Verdana\"";
+        ctx.textBaseline = "alphabetical";
+        ctx.textAlign = "left";
+        ctx.fillText("Serve Time", serveInfoX + 20, serveInfoY + 20);
+        ctx.fillText("Score", serveInfoX + 20, serveInfoY + 90);
+        ctx.textAlign = "right";
+        ctx.fillText(gameState.getServeTimeString(), serveInfoX + 260, serveInfoY + 50);
+        ctx.fillText(gameState.getScore(), serveInfoX + 260, serveInfoY + 120);
+    }
+
+    renderCustomerRequest(gameCanvas, ctx, dt, gameState) {
+        let matchLabelX = 100;
+        let matchLabelY = gameCanvas.height / 2 - 40;
+        ctx.fillStyle = Colors.COFFEE_BROWN;
+        ctx.beginPath();
+        ctx.roundRect(matchLabelX, matchLabelY, 230, 80, 20);
+        ctx.fill();
+        ctx.fillStyle = "white";
+        ctx.font = "36px \"Verdana\"";
+        ctx.textAlign = "left";
+        ctx.textBaseline = "middle";
+        ctx.fillText("Match:", matchLabelX + 20, matchLabelY + 40);
+
+        ctx.beginPath();
+        ctx.roundRect(matchLabelX + 155, matchLabelY + 5, 70, 70, 15);
+        ctx.fill();
+
+        ctx.fillStyle = Colors.coffeeColor(gameState.getTargetProportion());  
+        ctx.beginPath();
+        ctx.roundRect(matchLabelX + 160, matchLabelY + 10, 60, 60, 10);
+        ctx.fill();
     }
 
     onClick(event) {

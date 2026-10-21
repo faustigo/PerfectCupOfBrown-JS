@@ -24,7 +24,7 @@ export class BaseGameState {
     coffeePourRate = 0.0;
     milkPourRate = 0.0;
 
-    actionTime = 0;
+    actionTime = 0.0;
     action = ACTION_NEW_CUP;
 
     constructor(gameStateHandler) {
@@ -50,19 +50,34 @@ export class BaseGameState {
     }
 
     getServeTimeString() {
-        minutes = Math.min(9, Math.floor(this.serveTime / 60));
-        seconds = `${Math.floor(this.serveTime % 60)}`.padStart(2, "0");
-        millis = `${Math.floor(this.serveTime * 1000)}`.padStart(3, "0");
+        if (this.serveTime >= 600)
+            return "9:59:999";
+        let minutes = Math.min(9, Math.floor(this.serveTime / 60));
+        let seconds = `${Math.floor(this.serveTime % 60)}`.padStart(2, "0");
+        let millis = `${Math.floor(this.serveTime * 1000 % 1000)}`.padStart(3, "0");
         return `${minutes}:${seconds}:${millis}`;
     }
 
     calculateScoreOfCup() {
-        // TODO calculations for gamemodes
-        let fillFactor = this.coffeeAmount + this.milkAmount;
-        let ratioFactor = this.getMilkProportion();
-        let fillError = (fillFactor - COFFEE_TARGET) / COFFEE_TARGET;
-        let ratioError = ratioFactor - this.targetRatio;
-        console.log(`Fill Amount=${fillFactor}, error=${fillError}; Ratio=${ratioFactor}, Actual Ratio=${this.targetRatio}, error=${ratioError}`);
+    }
+
+    calculateScoreFactors() {
+        let fillErrorRaw = (this.coffeeAmount + this.milkAmount - COFFEE_TARGET) / COFFEE_TARGET;
+        let proportionErrorRaw = this.getMilkProportion() - this.targetRatio;
+        if (this.coffeeAmount + this.milkAmount < 1e-2)
+            proportionErrorRaw = -1.0;
+        return {
+            fillError: fillErrorRaw,
+            proportionError: proportionErrorRaw,
+            fillFactor: Math.max(0, 1 - Math.abs(fillErrorRaw)),
+            proportionFactor: Math.max(0, 1 - Math.abs(proportionErrorRaw)),
+            // Explainer for time factor:
+            // this.serveTime - 30 => Start penalizing performance after 30 seconds
+            // Math.exp(- " /30)   => Penalize performance according to an exponential decay (~36% @ 60s, ~5% @ 120s)
+            // Math.min(1.5, ")    => At most x1.5 score for finishing early
+            // Math.round(" * 100) / 100 => Round time factor to nearest 0.01
+            timeFactor: Math.round(Math.min(1.5, Math.exp(-(this.serveTime-30)/30)) * 100) / 100,
+        };
     }
 
     getScore() {
@@ -79,7 +94,7 @@ export class BaseGameState {
         if (this.action === ACTION_SERVE) {
             this.actionTime += dt;
             if (this.actionTime >= SERVE_TIME) {
-                this.actionTime = 0;
+                this.actionTime = 0.0;
                 this.action = ACTION_NEW_CUP;
                 this.resetCup();
                 this.targetRatio = this.generateRandomTarget();
@@ -87,19 +102,19 @@ export class BaseGameState {
         } else if (this.action === ACTION_DISPOSE) {
             this.actionTime += dt;
             if (this.actionTime >= DISPOSE_TIME) {
-                this.actionTime = 0;
+                this.actionTime = 0.0;
                 this.action = ACTION_NEW_CUP;
                 this.resetCup();
             }
         } else if (this.action === ACTION_NEW_CUP) {
             this.actionTime += dt;
             if (this.actionTime >= NEW_CUP_TIME) {
-                this.actionTime = 0;
+                this.actionTime = 0.0;
                 this.action = ACTION_NOTHING;
                 this.resetCup();
             }
         } else {
-            this.actionTime = 0;
+            this.actionTime = 0.0;
         }
         if (this.action !== ACTION_SERVE)
             this.serveTime += dt;
@@ -122,10 +137,10 @@ export class BaseGameState {
             return this.actionTime * this.actionTime;
         }
         if (this.action === ACTION_NEW_CUP) {
-            if (this.actionTime < 0)
+            if (this.actionTime < 0.0)
                 return 1.0;
             let frac = 1 - this.actionTime / NEW_CUP_TIME;
-            return Math.max(1 - this.actionTime * this.actionTime, 0);
+            return Math.max(1 - this.actionTime * this.actionTime, 0.0);
         }
         return 0.0;
     }
@@ -180,10 +195,10 @@ export class BaseGameState {
     serveCoffee() {
         if (this.action !== ACTION_NOTHING)
             return;
+        this.calculateScoreOfCup();
         this.actionTime = 0;
         this.serveTime = 0;
         this.action = ACTION_SERVE;
-        this.calculateScoreOfCup();
     }
 
     disposeCoffee() {
