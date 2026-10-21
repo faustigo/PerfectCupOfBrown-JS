@@ -39,8 +39,10 @@ export class TimeAttackState extends BaseGameState {
             return;
         super.tick(dt);
         this.timeRemaining -= dt;
-        if (this.timeRemaining <= 0)
+        if (this.timeRemaining <= 0) {
             this.gameFinished = true;
+            document.cookie = `pcob_time_attack_hi=${this.score}`;
+        }
         if (this.displayBonus) {
             this.displayBonus.displayTime -= dt;
             if (this.displayBonus.displayTime <= 0)

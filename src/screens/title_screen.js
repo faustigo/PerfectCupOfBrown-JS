@@ -26,6 +26,10 @@ export class TitleScreen extends BaseScreen {
             this.gameStateHandler.setScreen(new PracticeScreen(this.gameStateHandler));
             this.gameStateHandler.setGameState(new PracticeState());
         }));
+
+        this.timeAttackHighScore = parseScore(document.cookie.split(";")
+            .find(row => row.startsWith("pcob_time_attack_hi="))
+            ?.split("=")[1]);
     }
 
     render(gameCanvas, ctx, dt) {
@@ -33,13 +37,25 @@ export class TitleScreen extends BaseScreen {
         ctx.fillStyle = Colors.COFFEE_BROWN;
         ctx.beginPath();
         ctx.roundRect(gameCanvas.width/2 - 300, 80, 600, 120, 20);
+        ctx.roundRect(gameCanvas.width/2 + 150, 250, 200, 60, 20);
+        ctx.roundRect(gameCanvas.width/2 + 150, 350, 200, 60, 20);
         ctx.fill();
+
         ctx.fillStyle = "white";
         ctx.font = "48px \"Verdana\"";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText("A Perfect Cup of Brown", gameCanvas.width / 2, 140);
+        ctx.font = "24px \"Verdana\"";
+        ctx.textAlign = "left";
+        ctx.fillText(`HI: ${this.timeAttackHighScore}`, gameCanvas.width/2 + 160, 280);
+
         super.render(gameCanvas, ctx, dt);
     }
 
+}
+
+function parseScore(string) {
+    let parsed = Number.parseInt(string);
+    return Number.isNaN(parsed) ? 0 : parsed;
 }
