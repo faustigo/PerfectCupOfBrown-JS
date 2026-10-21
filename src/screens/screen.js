@@ -7,23 +7,28 @@ export class BaseScreen {
 
     addWidget(widget) {
         this.widgets.push(widget);
+        return widget;
     }
 
     render(gameCanvas, ctx, dt) {
-        for (var i = 0; i < this.widgets.length; ++i)
-            this.widgets[i].render(gameCanvas, ctx, dt);
+        for (var i = 0; i < this.widgets.length; ++i) {
+            if (this.widgets[i].isActive())
+                this.widgets[i].render(gameCanvas, ctx, dt);
+        }
     }
 
     onClick(event) {
         for (var i = 0; i < this.widgets.length; ++i) {
-            if (this.widgets[i].onClick(event))
+            if (this.widgets[i].isActive() && this.widgets[i].onClick(event))
                 break;
         }
     }
 
     setHovered(event) {
-        for (var i = 0; i < this.widgets.length; ++i)
-            this.widgets[i].setHovered(event);
+        for (var i = 0; i < this.widgets.length; ++i) {
+            if (this.widgets[i].isActive())
+                this.widgets[i].setHovered(event);
+        }
     }
 
     clearHovering() {
